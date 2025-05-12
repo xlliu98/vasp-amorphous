@@ -1,5 +1,5 @@
 import numpy as np
-
+import subprocess
 # ----- user data -------------------------------------------------------------
 molar_masses = {"Li": 6.9410, "Ta": 180.94788, "Cl": 35.45}     # g mol⁻¹
 stoich       = {"Li": 1, "Ta": 1, "Cl": 6}                      # LiTaCl₆
@@ -36,4 +36,26 @@ print("Atoms to place   :")
 for e, n in atom_counts.items():
     print(f"  {e}: {n:.2f}")
 
+# write the information to init.inp
+with open("init.inp", "w") as f:
+    f.write(f"tolerance 2.0\n")
+    f.write("filetype pdb\n")
+    f.write(f"pbc {box_diam_exact:.16f} {box_diam_exact:.16f} {box_diam_exact:.16f}\n")
+    f.write(f"output init.pdb\n\n")
 
+    for element in stoich.keys():
+        f.write(f"structure {element}.pdb\n")
+        f.write(f"  number {atom_counts[element]}\n")
+        f.write("end structure\n\n")
+
+print(f"Packmol input written to init.inp")
+
+# use packmol to generate an initial structure
+subprocess.call("/pscratch/sd/x/xlliu9/Software/packmol/packmol < init.inp", shell=True)
+
+# convert the init.pdb to VASP POSCAR format
+from ase.io import read, write
+atoms = read("init.pdb")
+atoms.set_cell([box_diam_exact, box_diam_exact, box_diam_exact])
+atoms.set_pbc([True, True, True])
+write("POSCAR", atoms, format="vasp")
