@@ -6,6 +6,8 @@ stoich       = {"Li": 1, "Ta": 1, "Cl": 6}                      # LiTaCl₆
 density      = 2.96                      # g cm⁻³
 box_diam     = 12.0                      # Å
 # ---------------------------------------------------------------------------
+
+# Write pdb files for packmol input
 pdbTemplate = (
     "HETATM    1  {el:<2}  {el} A   1       0.000   0.000   0.000  1.00  0.00          {el:>2}\n"
     "END\n"
