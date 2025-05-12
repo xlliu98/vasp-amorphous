@@ -1,0 +1,71 @@
+HEADER 
+TITLE     Built with Packmol                                             
+REMARK   Packmol generated pdb file 
+REMARK   Home-Page: http://m3g.iqm.unicamp.br/packmol
+REMARK
+CRYST1    12.16    12.16    12.16  90.00  90.00  90.00 P 1           1
+HETATM    1 Li    Li A   1       5.618   6.594   8.999                      Li  
+HETATM    2 Li    Li A   2       6.255   5.146   3.748                      Li  
+HETATM    3 Li    Li A   3       6.187   2.458   1.824                      Li  
+HETATM    4 Li    Li A   4       9.126   7.111   6.924                      Li  
+HETATM    5 Li    Li A   5       0.907   7.367   7.706                      Li  
+HETATM    6 Li    Li A   6       6.103  11.245  10.220                      Li  
+HETATM    7 Li    Li A   7      10.617   9.250   2.293                      Li  
+HETATM    8 Li    Li A   8       9.379  10.928   9.536                      Li  
+HETATM    9 Ta       B   1       4.968   1.335  12.105                      Ta  
+HETATM   10 Ta       B   2       6.979   0.497   2.375                      Ta  
+HETATM   11 Ta       B   3       9.788   2.244   1.785                      Ta  
+HETATM   12 Ta       B   4       4.669  10.233   8.735                      Ta  
+HETATM   13 Ta       B   5       6.954   0.150   0.010                      Ta  
+HETATM   14 Ta       B   6       7.004   4.780   8.080                      Ta  
+HETATM   15 Ta       B   7      11.474   1.413   4.641                      Ta  
+HETATM   16 Ta       B   8      11.100   8.803   5.337                      Ta  
+HETATM   17 Cl       C   1       9.789   3.840   7.710                      Cl  
+HETATM   18 Cl       C   2       9.213   4.578   1.948                      Cl  
+HETATM   19 Cl       C   3       6.203  11.714   4.495                      Cl  
+HETATM   20 Cl       C   4      12.050  10.784   3.086                      Cl  
+HETATM   21 Cl       C   5      10.629   5.832   2.870                      Cl  
+HETATM   22 Cl       C   6       2.955   6.765   6.462                      Cl  
+HETATM   23 Cl       C   7       2.391   8.780   1.378                      Cl  
+HETATM   24 Cl       C   8       5.699  11.664   6.738                      Cl  
+HETATM   25 Cl       C   9       3.975   5.115   0.249                      Cl  
+HETATM   26 Cl       C  10       4.392   4.019   8.676                      Cl  
+HETATM   27 Cl       C  11       0.060   4.981  10.003                      Cl  
+HETATM   28 Cl       C  12       6.735   7.695   0.951                      Cl  
+HETATM   29 Cl       C  13      10.645  11.162   5.179                      Cl  
+HETATM   30 Cl       C  14       2.782   2.350   2.309                      Cl  
+HETATM   31 Cl       C  15       3.116   5.508   2.953                      Cl  
+HETATM   32 Cl       C  16       8.658   3.675   0.001                      Cl  
+HETATM   33 Cl       C  17       5.419   9.608   5.597                      Cl  
+HETATM   34 Cl       C  18       6.126   8.177   7.369                      Cl  
+HETATM   35 Cl       C  19       9.294   0.567   3.964                      Cl  
+HETATM   36 Cl       C  20       3.330   9.891   3.581                      Cl  
+HETATM   37 Cl       C  21       6.118   3.469   5.290                      Cl  
+HETATM   38 Cl       C  22       2.952  12.050   3.570                      Cl  
+HETATM   39 Cl       C  23       8.693   9.484   4.845                      Cl  
+HETATM   40 Cl       C  24       4.575   9.195  11.843                      Cl  
+HETATM   41 Cl       C  25       1.382  10.780   8.776                      Cl  
+HETATM   42 Cl       C  26       7.239   2.518  10.477                      Cl  
+HETATM   43 Cl       C  27       8.155   3.974   6.222                      Cl  
+HETATM   44 Cl       C  28       6.573   0.959   9.065                      Cl  
+HETATM   45 Cl       C  29      10.523   7.627   9.585                      Cl  
+HETATM   46 Cl       C  30       8.290   3.447   3.923                      Cl  
+HETATM   47 Cl       C  31       3.648   8.384   5.151                      Cl  
+HETATM   48 Cl       C  32       8.767   6.724   0.774                      Cl  
+HETATM   49 Cl       C  33      12.159  10.549   0.120                      Cl  
+HETATM   50 Cl       C  34       2.259   2.301   4.679                      Cl  
+HETATM   51 Cl       C  35       1.760   1.427   6.922                      Cl  
+HETATM   52 Cl       C  36       3.380   6.882   8.569                      Cl  
+HETATM   53 Cl       C  37       7.700   6.094  11.053                      Cl  
+HETATM   54 Cl       C  38      11.341   2.904   9.744                      Cl  
+HETATM   55 Cl       C  39       2.740   0.449   9.721                      Cl  
+HETATM   56 Cl       C  40      11.985   5.527   5.711                      Cl  
+HETATM   57 Cl       C  41       7.859   1.277   5.935                      Cl  
+HETATM   58 Cl       C  42       9.008  11.421   7.095                      Cl  
+HETATM   59 Cl       C  43       8.517   6.177   3.804                      Cl  
+HETATM   60 Cl       C  44       5.987   9.064   2.674                      Cl  
+HETATM   61 Cl       C  45      11.743   1.973   7.317                      Cl  
+HETATM   62 Cl       C  46      10.025   8.687   0.135                      Cl  
+HETATM   63 Cl       C  47       1.165   8.245  10.548                      Cl  
+HETATM   64 Cl       C  48      11.929   3.723   2.477                      Cl  
+END

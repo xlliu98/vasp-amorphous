@@ -1,0 +1,17 @@
+tolerance 2.0
+filetype pdb
+pbc 12.159491710979216 12.159491710979216 12.159491710979216
+output init.pdb
+
+structure Li.pdb
+  number 8
+end structure
+
+structure Ta.pdb
+  number 8
+end structure
+
+structure Cl.pdb
+  number 48 
+end structure
+
