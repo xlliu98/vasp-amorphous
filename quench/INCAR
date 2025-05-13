@@ -1,0 +1,51 @@
+SYSTEM = LiTaCl6 
+ISTART =0                                                                                                                   
+ICHARG =2                                                                                                                  
+ISYM = 0
+GGA = PE                #   RP stands for RPBE, PE for PBE, 91 for PW91                                                    
+
+                                                                             
+Parameter for parallelization:                                                                                              
+---------                                                                                                                   
+--------------------------------                                                                                            
+LPLANE = .TRUE.                                                                                                          
+------------------------------------------                                                                                  
+Electronic Relaxation:                                                                                                      
+------------------------------------------                                                                                  
+   LREAL  = Auto             # Default for LREAL .FALSE. We recommend to use the real-space projection scheme for          
+                             # systems containing more than 20 atoms.                                                       
+   ENCUT  = 520                                                                                                      
+                                                                                                                            
+   PREC   = Normal        # precision:Medium/High/Low   default medium . the same time, ROPT accuracy of approximately     
+                             # 1meV/atom (10e-3). recommend to use PREC Normal for everyday calculations in VASP.4.5        
+   EDIFF  = 1e-5           # converge criterion: default=1e-4                                                             
+   ALGO  = VeryFast             # algotithm (8-CG, 48-RMM), Fast means intially use DAV algo then use RMM.                     
+   NELM=  60                  # default is 60                                                                               
+   NELMIN = 6                # the minimum number of electronic SC steps  Default is 2                                      
+                             # For most systems values between NELMIN=4 and NELMIN=6 are sufficient.                        
+   ISPIN  = 1                # spin polarized calculation (2-yes, 1-no)                                                     
+   IVDW = 11                                                                                                               
+-------------------------------------------                                                                                 
+Ionic Relaxation:                                                                                                           
+-------------------------------------------                                                                                                                    
+   NSW    = 2000           #     number of steps for IOM                                                                   
+   #AIMD using Nose-Hoover                                                 
+   IBRION = 0                   # choose molecular dynamics 
+   MDALGO = 2                   # using Nose-Hoover thermostat    
+   ISIF = 2                     # compute stress tensor but do not change box volume/shape 
+   TEBEG = TEMP
+   TEEND = TEMP 
+   POTIM = 1.0                  # time step in femto seconds 
+   SMASS = 1.0                  # setting the virtual mass for the Nose-Hoover thermostat                                                                                    
+--------------------------------------------                                                                                
+DOS Related:                                                                                                                
+--------------------------------------------                                                                                
+   ISMEAR = 0                                                                                                               
+   SIGMA  = 0.05                                                                                                             
+   LORBIT =11                                                                                                                
+--------------------------------------------                                                                                
+Output Control:                                                                                                             
+--------------------------------------------                                                                                
+   LWAVE  = .FALSE.                                                                                                         
+   LCHARG= .FALSE.  
+   NCORE= 11
