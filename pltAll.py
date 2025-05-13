@@ -86,26 +86,26 @@ for top_dir in dirs:
     timev = np.linspace(0, len(V)*timestep/1e3, len(V))
 
     steps = int(timeAvg * 1e3 / timestep)
-
-    time_running, E_running = getRunning(E, time, steps)
-    timep_running, P_running = getRunning(P, timep, steps)
-    timet_running, T_running = getRunning(T, time, steps)
-    timev_running, V_running = getRunning(V, timev, steps)
+    if len(time) > steps:
+        time_running, E_running = getRunning(E, time, steps)
+        timep_running, P_running = getRunning(P, timep, steps)
+        timet_running, T_running = getRunning(T, time, steps)
+        timev_running, V_running = getRunning(V, timev, steps)
+        data_running = {"Energy/eV": (E_running,time_running), "Temperature/K": (T_running,timet_running), 
+                "Pressure/kB": (P_running,timep_running), r"Volume/Å$^3$":(V_running, timev_running)}
     print("dir = ", top_dir , ", time: ", time[-1], "ps") 
     print(f"last {timeAvg} ps avg pressure: ", np.mean(P[-last_n_ps_steps:]))
     print(f"last {timeAvg * 2} ps avg pressure: ", np.mean(P[-last_n_ps_steps*2:]))
     print(f"last {timeAvg} ps avg energy: ", np.mean(E[-last_n_ps_steps:]))
     print(f"last {timeAvg * 2} ps avg energy: ", np.mean(E[-last_n_ps_steps*2:]))
 
-    data_running = {"Energy/eV": (E_running,time_running), "Temperature/K": (T_running,timet_running), 
-                    "Pressure/kB": (P_running,timep_running), r"Volume/Å$^3$":(V_running, timev_running)}
 
     data = {"Energy/eV": (E,time), "Temperature/K": (T,time), "Pressure/kB": (P,timep), r"Volume/Å$^3$":(V, timev)}
     fig, axes = plt.subplots(4, 1, sharex=True)
     for count, (k, v) in enumerate(data.items()):
         ax = axes[count]
         ax.plot(v[1], v[0], 'k')
-        if len(time) > 1000 and k in data_running:
+        if len(time) > steps and k in data_running:
             ax.plot(data_running[k][1], data_running[k][0], 'g')
         if k == "Pressure/kB":
             ax.axhline(5, color='g', lw=1.0, linestyle="--")
