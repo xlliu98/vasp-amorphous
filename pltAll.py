@@ -3,6 +3,15 @@ import numpy as np
 import os
 import subprocess
 
+# ----- user data -------------------------------------------------------------
+timestep = 1.0 # in fs
+timeAvg = 2 # in ps
+maxRestart = 10
+
+last_n_ps_steps = int(timeAvg * 1e3 / timestep)
+dirs = ["eql_1500"]
+# ---------------------------------------------------------------------------   
+
 def getET(filePath):   
     with open(filePath, mode='r') as f:        
         E=[]
@@ -37,12 +46,7 @@ grep_patterns = {
     "v.log": 'volume of cell'
 }
 
-timestep = 1.0 # in fs
-timeAvg = 2 # in ps
-maxRestart = 10
 
-last_2ps_steps = int(2 * 1e3 / timestep)
-dirs = ["eql_1500"]
 for top_dir in dirs:
     log_paths = {log: os.path.join(top_dir, log) for log in log_files}
     
@@ -88,10 +92,10 @@ for top_dir in dirs:
     timet_running, T_running = getRunning(T, time, steps)
     timev_running, V_running = getRunning(V, timev, steps)
     print("dir = ", top_dir , ", time: ", time[-1], "ps") 
-    print("last 2 ps avg pressure: ", np.mean(P[-last_2ps_steps:]))
-    print("last 4 ps avg pressure: ", np.mean(P[-last_2ps_steps*2:]))
-    print("last 2 ps avg energy: ", np.mean(E[-last_2ps_steps:]))
-    print("last 4 ps avg energy: ", np.mean(E[-last_2ps_steps*2:]))
+    print(f"last {timeAvg} ps avg pressure: ", np.mean(P[-last_n_ps_steps:]))
+    print(f"last {timeAvg * 2} ps avg pressure: ", np.mean(P[-last_n_ps_steps*2:]))
+    print(f"last {timeAvg} ps avg energy: ", np.mean(E[-last_n_ps_steps:]))
+    print(f"last {timeAvg * 2} ps avg energy: ", np.mean(E[-last_n_ps_steps*2:]))
 
     data_running = {"Energy/eV": (E_running,time_running), "Temperature/K": (T_running,timet_running), 
                     "Pressure/kB": (P_running,timep_running), r"Volume/Å$^3$":(V_running, timev_running)}
