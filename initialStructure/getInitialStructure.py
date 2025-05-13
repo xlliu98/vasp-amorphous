@@ -5,6 +5,7 @@ molar_masses = {"Li": 6.9410, "Ta": 180.94788, "Cl": 35.45}     # g mol⁻¹
 stoich       = {"Li": 1, "Ta": 1, "Cl": 6}                      # LiTaCl₆
 density      = 2.96                      # g cm⁻³
 box_diam     = 12.0                      # Å
+packmolPath = "/pscratch/sd/x/xlliu9/Software/packmol/packmol"
 # ---------------------------------------------------------------------------
 
 # Write pdb files for packmol input
@@ -61,7 +62,7 @@ with open("init.inp", "w") as f:
 print(f"Packmol input written to init.inp")
 
 # use packmol to generate an initial structure
-subprocess.call("/pscratch/sd/x/xlliu9/Software/packmol/packmol < init.inp", shell=True)
+subprocess.call(f"{packmolPath} < init.inp", shell=True)
 
 # convert the init.pdb to VASP POSCAR format
 from ase.io import read, write
