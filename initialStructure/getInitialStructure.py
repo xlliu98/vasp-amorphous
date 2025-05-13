@@ -10,7 +10,7 @@ packmolPath = "/pscratch/sd/x/xlliu9/Software/packmol/packmol"
 
 # Write pdb files for packmol input
 pdbTemplate = (
-    "HETATM    1  {el:<2}  {el} A   1       0.000   0.000   0.000  1.00  0.00          {el:>2}\n"
+    "HETATM    1  {el:<2}  {el:<3}A   1       0.000   0.000   0.000  1.00  0.00           {el:>2}\n"
     "END\n"
 )
 
