@@ -6,8 +6,9 @@ import subprocess
 # ----- user data -------------------------------------------------------------
 timestep = 1.0 # in fs
 timeAvg = 2 # in ps
+initialTime = 10 # in ps
 maxRestart = 10
-
+Nions = 64 # number of ions
 last_n_ps_steps = int(timeAvg * 1e3 / timestep)
 dirs = ["eql_1500"]
 # ---------------------------------------------------------------------------   
@@ -78,12 +79,24 @@ for top_dir in dirs:
             src_file = os.path.join(top_dir, mid_dir, "OSZICAR" if log == "et.log" else "OUTCAR")
             grep_and_append(src_file, pattern, log_paths[log])
 
+    initialSteps = int(initialTime * 1e3 / timestep)
     E, T = getET(top_dir + "/et.log")
     time = np.linspace(0, len(T)*timestep/1e3, len(T))
     P = getPorV(top_dir + "/p.log", -2)
     timep = np.linspace(0, len(P)*timestep/1e3, len(P))
     V = getPorV(top_dir + "/v.log", -1)
     timev = np.linspace(0, len(V)*timestep/1e3, len(V))
+    
+    if len(E) > initialSteps:
+        print(f"Trimming the initial {initialSteps} steps")
+        E = E[initialSteps:]
+        T = T[initialSteps:]
+        time = time[initialSteps:]
+        P = P[initialSteps:]
+        timep = timep[initialSteps:]
+        V = V[initialSteps:]
+        timev = timev[initialSteps:]
+    
 
     steps = int(timeAvg * 1e3 / timestep)
     if len(time) > steps:
@@ -93,15 +106,23 @@ for top_dir in dirs:
         timev_running, V_running = getRunning(V, timev, steps)
         data_running = {"Energy/eV": (E_running,time_running), "Temperature/K": (T_running,timet_running), 
                 "Pressure/kB": (P_running,timep_running), r"Volume/Å$^3$":(V_running, timev_running)}
+    Ediff = []
+    time_running2 = []
+    if len(time) > steps * 2:
+        time_running2, E_running2 = getRunning(E, time, steps * 2)
+        for i in range(len(E_running2)):
+            Ediff.append((E_running2[-1 - i] - E_running[-1 - i])*1e3)
+        Ediff.reverse()
     print("dir = ", top_dir , ", time: ", time[-1], "ps") 
     print(f"last {timeAvg} ps avg pressure: ", np.mean(P[-last_n_ps_steps:]))
     print(f"last {timeAvg * 2} ps avg pressure: ", np.mean(P[-last_n_ps_steps*2:]))
     print(f"last {timeAvg} ps avg energy: ", np.mean(E[-last_n_ps_steps:]))
     print(f"last {timeAvg * 2} ps avg energy: ", np.mean(E[-last_n_ps_steps*2:]))
+    print(f"Energy difference: {(np.mean(E[-last_n_ps_steps*2:]) - np.mean(E[-last_n_ps_steps:]))*1e3} meV")
 
 
-    data = {"Energy/eV": (E,time), "Temperature/K": (T,time), "Pressure/kB": (P,timep), r"Volume/Å$^3$":(V, timev)}
-    fig, axes = plt.subplots(4, 1, sharex=True)
+    data = {"Energy/eV": (E,time), "Temperature/K": (T,time), "Pressure/kB": (P,timep), r"Volume/Å$^3$":(V, timev), "E Diff/meV":(Ediff, time_running2)}
+    fig, axes = plt.subplots(5, 1, sharex=True, figsize=(8, 10))
     for count, (k, v) in enumerate(data.items()):
         ax = axes[count]
         ax.plot(v[1], v[0], 'k')
@@ -110,10 +131,13 @@ for top_dir in dirs:
         if k == "Pressure/kB":
             ax.axhline(5, color='g', lw=1.0, linestyle="--")
             ax.axhline(-5, color='g', lw=1.0, linestyle="--")
+        if k == "E Diff/meV":
+            ax.axhline(Nions, color='g', lw=1.0, linestyle="--")
+            ax.axhline(-Nions, color='g', lw=1.0, linestyle="--")
         if count == len(axes) - 1:
             ax.set_xlabel(r"$\Delta t$ (ps)")
         ax.set_ylabel(k)
-        ax.set_xlim(0)
+        ax.set_xlim(initialTime)
 
     plt.savefig("_".join(top_dir.split("/")) + "_ETPV.png", dpi=600, bbox_inches='tight')
 
