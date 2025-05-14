@@ -7,20 +7,23 @@
 #SBATCH -e slurm_%j.err
 module load VASP
 vasp_exe=$(which vasp_gam)
-echo "cuda:$CUDA_VISIBLE_DEVICES"
-
 VASP_COMMAND="mpirun -np ${SLURM_NTASKS} $vasp_exe"
-ulimit -s unlimited
 
 # Parameters
 max_iter=10
 tolerance_kbar=5
-run_time_ps=4
-timestep_fs=1
-avg_window_ps=2
-steps_to_average=$((1000 * avg_window_ps / timestep_fs))
+# Extract values from INCAR
 NSW=$(awk '$1 == "NSW" {print $3}' INCAR)
-echo "Will run $NSW steps each iteration."
+POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
+# Compute total run time (ps) and timestep (fs)
+timestep_fs=$POTIM
+avg_window_ps=2
+run_time_ps=$(awk -v n="$NSW" -v p="$POTIM" 'BEGIN { printf "%.3f\n", n * p / 1000 }')
+steps_to_average=$(awk -v avg=2 -v p="$POTIM" 'BEGIN { printf "%.0f\n", avg * 1000 / p }')
+
+# Print result
+echo "Running $NSW steps at $POTIM fs/step = $run_time_ps ps total"
+echo "Averaging over $avg_window_ps ps = $steps_to_average steps"
 mkdir -p history
 
 for ((i=1; i<=max_iter; i++)); do
