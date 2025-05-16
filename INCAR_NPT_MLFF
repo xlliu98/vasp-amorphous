@@ -1,0 +1,46 @@
+SYSTEM = alumina 
+ISTART =0                                                                                                                   
+ICHARG =2                                                                                                                  
+ISYM = 0
+ML_LMLFF  = .TRUE.
+ML_MODE = train   
+POTIM = 1                                                                                                             
+GGA = PE                                                                                           
+------------------------------------------                                                                                  
+Electronic Relaxation:                                                                                                      
+------------------------------------------                                                                                                                                
+ENCUT  = 520                                                                                                          
+PREC   = Normal    
+EDIFF  = 1e-5             
+ALGO  = Normal                  
+NELM=  60                      
+NELMIN = 6                                            
+ISPIN  = 1            
+IVDW = 11                                                                                                               
+-------------------------------------------                                                                                 
+Ionic Relaxation:                                                                                                           
+-------------------------------------------                                                                                                                    
+   NSW    = 20000                   
+   IBRION = 0                  
+   ISIF   = 3                  
+   TEBEG = 300
+   TEEND = 400 
+   MDALGO = 3
+   LANGEVIN_GAMMA=5
+   LANGEVIN_GAMMA_L=5                                                                               
+   ISMEAR = 0                                                                                                               
+   SIGMA  = 0.05                                                                                                                                                                                                                
+--------------------------------------------                                                                                
+Output Control:                                                                                                             
+--------------------------------------------                                                                                
+   LWAVE  = .FALSE.                                                                                                         
+   LCHARG= .FALSE.
+   NWRITE = 1
+   ML_MB = 3000   
+   NCORE= 1
+    
+                                                                                                    
+                                                                                                                            
+
+
+

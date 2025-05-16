@@ -6,11 +6,11 @@ import subprocess
 # ----- user data -------------------------------------------------------------
 timestep = 1.0 # in fs
 timeAvg = 2 # in ps
-initialTime = 10 # in ps
+initialTime = 0 # in ps
 maxRestart = 10
 Nions = 64 # number of ions
 last_n_ps_steps = int(timeAvg * 1e3 / timestep)
-dirs = ["eql_1500"]
+dirs = ["scale/run_4"]
 # ---------------------------------------------------------------------------   
 
 def getET(filePath):   
