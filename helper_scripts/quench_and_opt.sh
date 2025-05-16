@@ -4,7 +4,8 @@ endTemp=300
 step=300
 
 prevDir=""
-
+NSW=$(awk '$1 == "NSW" {print $3}' INCAR)
+POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
 for temp in $(seq $startTemp -$step $endTemp); do
     rundir="quench_${temp}"
     mkdir -p $rundir
@@ -26,23 +27,9 @@ for temp in $(seq $startTemp -$step $endTemp); do
     start_time=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$start_time] Starting quench at ${temp} K ..."
 
-    $VASP_COMMAND > vasp.out &
-
-    # Extract NSW from INCAR
-    NSW=$(awk '$1 == "NSW" {print $3}' INCAR)
-    echo "[$end_time] Will run $NSW steps at ${temp} K."
-    # Monitor until OSZICAR reaches step == NSW
-    while true; do
-        if [ -f OSZICAR ]; then
-            last_line=$(tail -n 1 OSZICAR)
-            if [[ $last_line =~ ^[[:space:]]*${NSW} ]]; then
-                end_time=$(date '+%Y-%m-%d %H:%M:%S')
-                echo "[$end_time] VASP completed $NSW steps at ${temp} K."
-                break
-            fi
-        fi
-        sleep 60
-    done
+    $VASP_COMMAND > vasp.out
+    end_time=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$end_time] VASP finished after $NSW steps with $POTIM fs/step at ${temp} K."
 
     cd ..
     prevDir=$rundir
