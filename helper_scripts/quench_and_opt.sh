@@ -3,19 +3,12 @@ startTemp=1500
 endTemp=300
 step=300
 
-prevDir=""
 NSW=$(awk '$1 == "NSW" {print $3}' INCAR)
 POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
 for temp in $(seq $startTemp -$step $endTemp); do
     rundir="quench_${temp}"
     mkdir -p $rundir
-
-    if [ "$temp" -eq "$startTemp" ]; then
-        cp POSCAR $rundir/POSCAR
-    else
-        cp ${prevDir}/CONTCAR $rundir/POSCAR
-    fi
-
+    cp POSCAR $rundir/POSCAR
     cp INCAR $rundir/INCAR
 
     # Replace TEMP in INCAR with actual temperature
@@ -28,42 +21,55 @@ for temp in $(seq $startTemp -$step $endTemp); do
     echo "[$start_time] Starting quench at ${temp} K ..."
 
     $VASP_COMMAND > vasp.out
+    cp CONTCAR ../POSCAR
     end_time=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$end_time] VASP finished after $NSW steps with $POTIM fs/step at ${temp} K."
 
     cd ..
-    prevDir=$rundir
 done
 
 echo "Quenching sequence completed."
 echo "Starting optimization sequence..."
-# Optimization sequence, assuming quench_300/CONTCAR is the starting point
+# Optimization sequence, assuming POSCAR is the starting point
 
-# Loop over scales from 1.000 to 0.980 (inclusive), step -0.001
-prevPOSCAR="quench_300/CONTCAR"
+# Loop over scales from 0.999 to 0.980 (inclusive) successively, with step size = -0.001
 scale_script="../../scalePOSCAR.py"
+
+# Define absolute target scales
+abs_scales=()
 for i in $(seq 0 20); do
-    scale=$(awk -v n=$i 'BEGIN {printf "%.3f", 1.000 - 0.001 * n}')
-    dir="${scale//./_}"
+    abs=$(awk -v n=$i 'BEGIN {printf "%.6f", 1.000 - 0.001 * n}')
+    abs_scales+=("$abs")
+done
 
-    echo ">>> Preparing $dir with scale = $scale"
+# Loop through scale pairs
+for i in $(seq 1 ${#abs_scales[@]}); do
+    prev_scale=${abs_scales[$((i - 1))]}
+    curr_scale=${abs_scales[$i]}
+    dir=$(printf "scale_%03d" $i)
 
-    mkdir -p $dir
-    cd $dir
-    ln -sf ../../INCAR_OPT INCAR
+    # Compute relative scale: curr / prev
+    rel_scale=$(awk -v a=$curr_scale -v b=$prev_scale 'BEGIN {printf "%.16f", a / b}')
+
+    echo ">>> Preparing $dir with relative scale = $rel_scale (from $prev_scale to $curr_scale)"
+
+    mkdir -p "$dir"
+    cd "$dir"
+
+    ln -sf ../../incar_templates/INCAR_OPT INCAR
     ln -sf ../../POTCAR POTCAR
     ln -sf ../../KPOINTS KPOINTS
-    cp "../$prevPOSCAR" POSCAR
+    cp ../POSCAR POSCAR
 
-    # Generate scaled POSCAR
-    python $scale_script "POSCAR" "$scale"
+    python "$scale_script" POSCAR "$rel_scale"
     mv POSCAR_scaled POSCAR
 
     echo "Running VASP in $dir ..."
     $VASP_COMMAND > vasp.out
 
-    prevPOSCAR="$dir/CONTCAR"
+    cp CONTCAR ../POSCAR
     cd ..
 done
+
 
 echo "Optimization sequence finished..."

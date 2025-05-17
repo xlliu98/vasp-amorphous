@@ -134,5 +134,5 @@ awk -v nsw="$NSW" '
 ' INCAR > INCAR_tmp && mv INCAR_tmp INCAR
 echo "Running VASP..."
 $VASP_COMMAND > vasp.out 
-
+cp CONTCAR ../POSCAR
 echo "=== Final equilibration done==="
