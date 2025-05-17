@@ -16,11 +16,11 @@ subprocess.call(f"cp quench_and_opt/POSCAR_OPTIMIZED {workingDir}/POSCAR", shell
 subprocess.call(f"cp incar_templates/INCAR_NVT_MLFF {workingDir}/INCAR", shell=True)
 
 # ----- Link ML_FF file -------------------------------------------------------------
-subprocess.call(f"ln -sf mlff_refit/ML_FF {workingDir}/ML_FF", shell=True)
+subprocess.call(f"ln -sf mlff_refit/ML_FFN {workingDir}/ML_FF", shell=True)
 
 # ----- Generate and run slurm script -------------------------------------------------------------
 subprocess.call(f"cat {mlffSlurm} helper_scripts/mlff_production.sh >  {workingDir}/run.sh", shell=True)
-os.chkdir(workingDir)
+os.chdir(workingDir)
 for temp in temps:
     currDir = f"{temp}K"
     os.makedirs(currDir, exist_ok=True)
