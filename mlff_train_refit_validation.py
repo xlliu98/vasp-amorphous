@@ -89,6 +89,7 @@ for temp in temps:
     subprocess.call("ln -sf ../runML.sh runML.sh", shell=True)
     subprocess.call(f"sbatch --dependency=afterok:{mlffMDJobId} runAB.sh", shell=True)
     subprocess.call(f"sbatch --dependency=afterok:{mlffMDJobId} runML.sh", shell=True)
+    os.chdir("../")
 
 
 
