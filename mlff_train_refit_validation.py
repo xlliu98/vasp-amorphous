@@ -16,7 +16,7 @@ workingDir = "mlff_training"
 subprocess.call(f"cp quench_and_opt/POSCAR_OPTIMIZED {workingDir}/POSCAR", shell=True)
 
 # ----- Copy INCAR file -------------------------------------------------------------
-subprocess.call(f"cp INCAR_NPT_MLFF {workingDir}/INCAR", shell=True)
+subprocess.call(f"cp incar_templates/INCAR_NPT_MLFF {workingDir}/INCAR", shell=True)
 
 # ----- Generate and run slurm script -------------------------------------------------------------
 subprocess.call(f"cat {trainingSlurm} helper_scripts/mlff_training.sh > {workingDir}/run.sh", shell=True)
@@ -26,12 +26,12 @@ traingJobId = trainingJob.stdout.strip().split()[-1]
 
 # ----- Refit -------------------------------------------------------------
 os.chdir(cwd)
-workingDir = "mlff_training/refit"
+workingDir = "mlff_refit"
 os.makedirs(workingDir, exist_ok=True)
 os.chdir(workingDir)
 # ----- Copy and modify INCAR file for refit -------------------------------------------------------------
 modify_incar(
-    "../INCAR", "INCAR",
+    "../mlff_training/INCAR", "INCAR",
     {
         "ML_MODE": "refit"
     }

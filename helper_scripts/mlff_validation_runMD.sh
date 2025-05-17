@@ -2,8 +2,8 @@
 # used under validation/*K/ directory
 ln -sf ../../POTCAR POTCAR
 ln -sf ../../KPOINTS KPOINTS
-ln -sf ../../mlff_training/POSCAR POSCAR
-ln -sf ../../mlff_training/refit/ML_FF ML_FF
+ln -sf ../../mlff_refit/POSCAR POSCAR
+ln -sf ../../mlff_refit/ML_FFN ML_FF
 
 $VASP_COMMAND > vasp.out
 
