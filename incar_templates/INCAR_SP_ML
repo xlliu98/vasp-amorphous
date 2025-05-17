@@ -2,48 +2,27 @@ SYSTEM = alumina
 ISTART =0                                                                                                                   
 ICHARG =2                                                                                                                  
 ISYM = 0
-# NBANDS = 500   
 ML_LMLFF         = .TRUE.
-ML_MODE = run
-
-POTIM = 1                                                                                                             
-GGA = PE                #   RP stands for RPBE, PE for PBE, 91 for PW91                                                    
-# VOSKOWN = 1                                                                                                               
-#POTIM = 0.15             # default is 0.5 for frequency calculations a smaller values should be set ,0.02 example.          
- -----------------------------------------                                                                                  
-
-                                                                             
-Parameter for parallelization:                                                                                              
----------                                                                                                                   
---------------------------------                                                                                            
-LPLANE = .TRUE.                                                                                                          
+ML_MODE = run                                                                                             
+GGA = PE                                                                                       
 ------------------------------------------                                                                                  
 Electronic Relaxation:                                                                                                      
 ------------------------------------------                                                                                  
-   LREAL  = Auto             # Default for LREAL .FALSE. We recommend to use the real-space projection scheme for          
-                             # systems containing more than 20 atoms.                                                       
-   ENCUT  = 520                                                                                                      
-                                                                                                                            
-   PREC   = Normal        # precision:Medium/High/Low   default medium . the same time, ROPT accuracy of approximately     
-                             # 1meV/atom (10e-3). recommend to use PREC Normal for everyday calculations in VASP.4.5        
-   EDIFF  = 1e-5            # converge criterion: default=1e-4                                                             
-   ALGO  = Normal             # algotithm (8-CG, 48-RMM), Fast means intially use DAV algo then use RMM.                     
-   #IALGO = 48
-   NELM=  60                  # default is 60                                                                               
-   NELMIN = 6                # the minimum number of electronic SC steps  Default is 2                                      
-                             # For most systems values between NELMIN=4 and NELMIN=6 are sufficient.                        
-#   NELMDL= -5                                                                                                                    
-   #MAGMOM = 16*5  33*0              local magnetic moment in x,y,z                                                      
-   ISPIN  = 1                # spin polarized calculation (2-yes, 1-no)                                                     
-#   NUPDOWN=1
+   LREAL  = Auto                                                        
+   ENCUT  = 520                                                                                                                                                                                                         
+   PREC   = Normal      
+   EDIFF  = 1e-5                                                              
+   ALGO  = Normal         
+   NELM=  60                                                                                               
+   NELMIN = 6                                                                  
+   ISPIN  = 1               
    IVDW = 11                                                                                                               
 -------------------------------------------                                                                                 
 Ionic Relaxation:                                                                                                           
 -------------------------------------------                                                                                                                    
-   NSW    = 0          #     number of steps for IOM                                                                   
-   #AIMD using Nose-Hoover                                                 
-   IBRION = -1                   # choose molecular dynamics 
-   ISIF   = 3                     # compute stress tensor but do not change box volume/shape 
+   NSW    = 0                                                          
+   IBRION = -1                
+   ISIF   = 3                  
 --------------------------------------------                                                                                
 DOS Related:                                                                                                                
 --------------------------------------------                                                                                
@@ -57,7 +36,6 @@ Output Control:
    NWRITE = 1
    ML_MB = 3000   
    NCORE= 16
-   #NPAR= 4
     
                                                                                                     
                                                                                                                             

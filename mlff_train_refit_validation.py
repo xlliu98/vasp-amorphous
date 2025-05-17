@@ -53,14 +53,14 @@ os.chdir(cwd)
 prevWorkingDir = workingDir
 workingDir = "mlff_validation"
 os.makedirs(workingDir, exist_ok=True)
-subprocess.call(f"cat {mlffSlurm} helper_scripts/mlff_validation_runMD.sh > {workingDir}/run.sh", shell=True)
+subprocess.call(f"cat {mlffSlurm} helper_scripts/mlff_validation_runMD.sh > {workingDir}/runMD.sh", shell=True)
 subprocess.call(f"cat {mlffValidationAb} helper_scripts/mlff_validation_runAB.sh > {workingDir}/runAB.sh", shell=True)
 subprocess.call(f"cat {mlffValidationML} helper_scripts/mlff_validation_runML.sh > {workingDir}/runML.sh", shell=True)
 os.chdir(workingDir)
 
 # ----- Copy and modify INCAR file for test run -------------------------------------------------------------
 modify_incar(
-    "../{prevWorkingDir}/INCAR", "INCAR",
+    f"../{prevWorkingDir}/INCAR", "INCAR",
     {
         "ML_MODE": "run",
         "NSW" : "50000"
@@ -81,7 +81,8 @@ for temp in temps:
             "TEEND": str(temp),
         }
     )
-    mlffMDJob = subprocess.run(["sbatch", f"--dependency=afterok:{refitJobId}", "run.sh"],
+    subprocess.call("ln -sf ../runMD.sh runMD.sh", shell=True)
+    mlffMDJob = subprocess.run(["sbatch", f"--dependency=afterok:{refitJobId}", "runMD.sh"],
                       capture_output=True, text=True)
     mlffMDJobId = mlffMDJob.stdout.strip().split()[-1]
     print(f"Chained mlff MD job to refit job: {mlffMDJobId} depends on {refitJobId}")
