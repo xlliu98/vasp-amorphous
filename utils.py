@@ -1,3 +1,19 @@
+
+def modify_incar(input_file, output_file, substitutions):
+    with open(input_file, "r") as infile, open(output_file, "w") as outfile:
+        for line in infile:
+            stripped = line.strip()
+            if "=" in stripped and not stripped.startswith("#"):
+                key = stripped.split("=")[0].strip().upper()
+                if key in substitutions:
+                    outfile.write(f"{key} = {substitutions[key]}\n")
+                else:
+                    outfile.write(line)
+            else:
+                outfile.write(line)
+
+
+
 # see https://www.vasp.at/wiki/index.php/Available_pseudopotentials for the latest
 vasp_potcar_recommended = {
     "H":     "H",           # Default is sufficient

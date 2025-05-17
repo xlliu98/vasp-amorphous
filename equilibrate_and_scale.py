@@ -1,6 +1,6 @@
 import subprocess
 import os
-from utils import vasp_potcar_recommended
+from utils import vasp_potcar_recommended, modify_incar
 # ----- user data -------------------------------------------------------------
 molar_masses = {"Li": 6.9410, "Ta": 180.94788, "Cl": 35.45}     # g mol⁻¹
 stoich       = {"Li": 1, "Ta": 1, "Cl": 6}                      # LiTaCl₆
@@ -127,84 +127,49 @@ systemName = ""
 for el in stoich.keys():
     systemName += f"{el}{stoich[el]}"
 temperature = int((melting_point + 300 - 1)/ 300) * 300
-# write the INCAR file
-input_incar = "INCAR_NVT"
-eql_incar = "INCAR_NVT_EQL"
 
-with open(input_incar, "r") as infile, open(eql_incar, "w") as outfile:
-    for line in infile:
-        # Skip comments and empty lines
-        stripped = line.strip()
-        if "=" in stripped and not stripped.startswith("#"):
-            key = stripped.split("=")[0].strip().upper()
-            if key == "SYSTEM":
-                outfile.write(f"SYSTEM = {systemName}\n")
-                continue
-            elif key == "ENCUT":
-                outfile.write(f"ENCUT = {1.3 * max_enmax:.2f}\n")
-                continue
-            elif key == "POTIM":
-                outfile.write(f"POTIM = {timestep:.2f}\n")
-                continue
-            elif key == "TEBEG":
-                outfile.write(f"TEBEG = {temperature}\n")
-                continue
-            elif key == "TEEND":
-                outfile.write(f"TEEND = {temperature}\n")
-                continue
-            else:
-                outfile.write(line)
-        else:
-            outfile.write(line)
 
-scale_incar = "INCAR_NVT_SCALE"
-with open(eql_incar, "r") as infile, open(scale_incar, "w") as outfile:
-    for line in infile:
-        # Skip comments and empty lines
-        stripped = line.strip()
-        if "=" in stripped and not stripped.startswith("#"):
-            key = stripped.split("=")[0].strip().upper()
-            if key == "NSW":
-                outfile.write(f"NSW = {int(4 * 1e3/timestep)}\n")
-                continue
-            else:
-                outfile.write(line)
-        else:
-            outfile.write(line)
+# Step 1: Generate INCAR_NVT_EQL
+modify_incar(
+    "INCAR_NVT", "INCAR_NVT_EQL",
+    {
+        "SYSTEM": systemName,
+        "ENCUT": f"{1.3 * max_enmax:.2f}",
+        "POTIM": f"{timestep:.2f}",
+        "TEBEG": temperature,
+        "TEEND": temperature,
+    }
+)
 
-quench_incar = "INCAR_NVT_QUENCH"
-with open(eql_incar, "r") as infile, open(quench_incar, "w") as outfile:
-    for line in infile:
-        # Skip comments and empty lines
-        stripped = line.strip()
-        if "=" in stripped and not stripped.startswith("#"):
-            key = stripped.split("=")[0].strip().upper()
-            if key == "NSW":
-                outfile.write(f"NSW = {int(2 * 1e3/timestep)}\n")
-            elif key == "TEBEG":
-                outfile.write(f"TEBEG = TEMP\n")
-            elif key == "TEEND":
-                outfile.write(f"TEEND = TEMP\n")
-            else:
-                outfile.write(line)
-        else:
-            outfile.write(line)
+# Step 2: Create INCAR_NVT_SCALE with modified NSW
+modify_incar(
+    "INCAR_NVT_EQL", "INCAR_NVT_SCALE",
+    {
+        "NSW": int(4 * 1e3 / timestep),
+    }
+)
 
-with open("INCAR_OPT", "r") as infile, open("INCAR_TEMP", "w") as outfile:
-    for line in infile:
-        # Skip comments and empty lines
-        stripped = line.strip()
-        if "=" in stripped and not stripped.startswith("#"):
-            key = stripped.split("=")[0].strip().upper()
-            if key == "SYSTEM":
-                outfile.write(f"SYSTEM = {systemName}\n")
-            elif key == "ENCUT":
-                outfile.write(f"ENCUT = {1.3 * max_enmax:.2f}\n")
-            else:
-                outfile.write(line)
-        else:
-            outfile.write(line)
+# Step 3: Create INCAR_NVT_QUENCH with TEMP placeholders
+modify_incar(
+    "INCAR_NVT_EQL", "INCAR_NVT_QUENCH",
+    {
+        "NSW": int(2 * 1e3 / timestep),
+        "TEBEG": "TEMP",
+        "TEEND": "TEMP",
+    }
+)
+
+# Step 4: Modify SYSTEM and ENCUT in INCAR_OPT
+modify_incar(
+    "INCAR_OPT", "INCAR_TEMP",
+    {
+        "SYSTEM": systemName,
+        "ENCUT": f"{1.3 * max_enmax:.2f}",
+    }
+)
+
 subprocess.call("mv INCAR_TEMP INCAR_OPT", shell=True)
+
 # ----- Generate and run slurm script -------------------------------------------------------------
 subprocess.call(f"cat {AIMDslurm} equilibrate_and_scale.sh > equilibrate_and_scale/run.sh", shell=True)
 os.chdir("equilibrate_and_scale")

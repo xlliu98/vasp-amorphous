@@ -1,9 +1,6 @@
 import numpy as np
 import sys
 
-# Constants
-bulk = 100  # GPa, estimated bulk modulus
-
 def scalePOSCAR(filePath, scale):
     # # Convert pressure (kbar) to scaling factor
     # p_GPa = pressure_kbar / 10.0
