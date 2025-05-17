@@ -118,10 +118,10 @@ cp INCAR final_eql/INCAR
 cd final_eql
 ln -sf ../../POTCAR POTCAR
 ln -sf ../../KPOINTS KPOINTS
-# chang NSW in INCAR to 20 ps/POTIM
+# chang NSW in INCAR to 10 ps/POTIM
 POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
-# Compute number of steps: 20 ps = 20000 fs
-NSW=$(awk -v potim="$POTIM" 'BEGIN { printf "%d", 20000 / potim }')
+# Compute number of steps: 10 ps = 10000 fs
+NSW=$(awk -v potim="$POTIM" 'BEGIN { printf "%d", 10000 / potim }')
 
 # Replace NSW line in INCAR with new value
 awk -v nsw="$NSW" '
