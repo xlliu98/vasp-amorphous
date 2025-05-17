@@ -1,7 +1,7 @@
 import re
 import subprocess
 import os
-from utils import vasp_potcar_recommended, modify_incar
+from utils import *
 # ----- user data -------------------------------------------------------------
 molar_masses = {"Li": 6.9410, "Ta": 180.94788, "Cl": 35.45}     # g mol⁻¹
 stoich       = {"Li": 1, "Ta": 1, "Cl": 6}                      # LiTaCl₆
@@ -10,8 +10,8 @@ melting_point = 1500 # K, will be rounded to the nearest multiples of 300 K, gur
 box_diam     = 12.0                      # Å
 packmolPath = "/home/xiaolin/software/packmol-20.15.2/packmol"
 potcarPath = "/home/xiaolin/VASP/paw-pbe-64"
-AIMDslurm = "run_kepler_gpu.sh"
-MLFFslurm = "run_kepler_cpu.sh"
+AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
+MLFFslurm = "slurm_scripts/run_kepler_cpu.sh"
 potcarDict = {"Li": "Li", "Ta": "Ta_pv", "Cl": "Cl"}  # use a lower ENMAX for Li
 # ---------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ print(f"Formula units     : {n_formula_rounded:.2f}")
 print(f"Box diameter     : {box_diam_exact:.16f} Å")
 print("Atoms to place   :")
 for e, n in atom_counts.items():
-    print(f"  {e}: {n:.2f}")
+    print(f"  {e}: {n}")
 
 # write the information to init.inp
 with open("init.inp", "w") as f:
@@ -84,7 +84,7 @@ subprocess.call("rm init.pdb init.inp", shell=True)
 for el in stoich.keys():
     subprocess.call(f"rm {el}.pdb", shell=True)
 os.makedirs("equilibrate_and_scale", exist_ok=True)
-subprocess.call("cp POSCAR equilibrate_and_scale", shell=True)
+subprocess.call("cp POSCAR equilibrate_and_scale/", shell=True)
 
 # ----- Generate POTCAR File -------------------------------------------------------------
 # Read elements from the POSCAR file
@@ -129,8 +129,10 @@ for el in stoich.keys():
     systemName += f"{el}{stoich[el]}"
 temperature = int((melting_point + 300 - 1)/ 300) * 300
 
+cwd = os.getcwd()
+os.chdir("incar_templates")
 
-# Step 1: Generate INCAR_NVT_EQL
+# Step 1: Generate INCAR_NVT_EQL used in section 1 for equilibration
 modify_incar(
     "INCAR_NVT", "INCAR_NVT_EQL",
     {
@@ -142,7 +144,7 @@ modify_incar(
     }
 )
 
-# Step 2: Create INCAR_NVT_SCALE with modified NSW
+# Step 2: Create INCAR_NVT_SCALE with modified NSW for scaling according to pressure in section 1
 modify_incar(
     "INCAR_NVT_EQL", "INCAR_NVT_SCALE",
     {
@@ -150,7 +152,7 @@ modify_incar(
     }
 )
 
-# Step 3: Create INCAR_NVT_QUENCH with TEMP placeholders
+# Step 3: Create INCAR_NVT_QUENCH with TEMP placeholders used in section 2
 modify_incar(
     "INCAR_NVT_EQL", "INCAR_NVT_QUENCH",
     {
@@ -160,7 +162,7 @@ modify_incar(
     }
 )
 
-# Step 4: Modify SYSTEM and ENCUT in INCAR_OPT
+# Step 4: Modify SYSTEM and ENCUT in INCAR_OPT used in section 2
 modify_incar(
     "INCAR_OPT", "INCAR_TEMP",
     {
@@ -171,6 +173,21 @@ modify_incar(
 
 subprocess.call("mv INCAR_TEMP INCAR_OPT", shell=True)
 
+# Step 4: Modify SYSTEM and ENCUT in INCAR_NPT_MLFF, INCAR_NVT_MLFF, INCAR_SP_AB, and INCAR_SP_ML
+#  used in MLFF training and validation, and production in section 3 and 4
+mlffINCARs = ["INCAR_NPT_MLFF", "INCAR_NVT_MLFF", "INCAR_SP_AB", "INCAR_SP_ML"]
+for mlffINCAR in mlffINCARs:
+    modify_incar(
+        mlffINCAR, "INCAR_TEMP",
+        {
+            "SYSTEM": systemName,
+            "ENCUT": f"{1.3 * max_enmax:.2f}",
+        }
+    )
+    subprocess.call(f"mv INCAR_TEMP {mlffINCAR}", shell=True)
+
+
+os.chdir(cwd)
 # ----- Modify, generate and run slurm script -------------------------------------------------------------
 folder = "slurm_scripts"
 # Regex pattern to find SLURM -J lines
@@ -189,6 +206,7 @@ for filename in os.listdir(folder):
                 if match:
                     line = f"{match.group(1)}{systemName}\n"
                 f.write(line)
-subprocess.call(f"cat {AIMDslurm} equilibrate_and_scale.sh > equilibrate_and_scale/run.sh", shell=True)
+
+subprocess.call(f"cat {AIMDslurm} helper_scripts/equilibrate_and_scale.sh > equilibrate_and_scale/run.sh", shell=True)
 os.chdir("equilibrate_and_scale")
 subprocess.call("sbatch run.sh", shell=True)

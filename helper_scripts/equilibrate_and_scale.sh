@@ -1,5 +1,5 @@
 
-ln -sf ../INCAR_NVT_EQL INCAR
+ln -sf ../incar_templates/INCAR_NVT_EQL INCAR
 ln -sf ../POTCAR POTCAR
 ln -sf ../KPOINTS KPOINTS
 POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
@@ -45,7 +45,7 @@ max_iter=20
 tolerance_kbar=5
 mkdir -p "scale"
 cd "scale" 
-ln -sf ../../INCAR_NVT_SCALE INCAR
+ln -sf ../../incar_templates/INCAR_NVT_SCALE INCAR
 ln -sf ../../POTCAR POTCAR
 ln -sf ../../KPOINTS KPOINTS
 cp ../CONTCAR POSCAR
@@ -78,17 +78,10 @@ for ((i=1; i<=max_iter; i++)); do
     # Run VASP
     echo "Running VASP..."
     $VASP_COMMAND > vasp.out
-    while true; do
-        if [ -f OSZICAR ]; then
-            last_line=$(tail -n 1 OSZICAR)
-            if [[ $last_line =~ ^[[:space:]]*${NSW} ]]; then
-                end_time=$(date '+%Y-%m-%d %H:%M:%S')
-                echo "[$end_time] VASP completed $NSW steps."
-                break
-            fi
-        fi
-        sleep 60
-    done
+
+    end_time=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$end_time] VASP completed $NSW steps."
+
     # Parse pressure from OUTCAR
     echo "Extracting pressure..."
     grep "total pressure" OUTCAR | awk '{print $(NF-1)}' > p.log
@@ -105,11 +98,10 @@ for ((i=1; i<=max_iter; i++)); do
     fi
 
     # Rescale using Python
-    echo "Rescaling lattice with pressure $avg_p kBar, assuming bulk modulus 100.0 GPa"
-    python ../scalePOSCAR.py POSCAR $(awk -v p="$avg_p" 'BEGIN { printf "%.6f", p / 1000 }')
+    echo "Rescaling lattice with pressure $avg_p kBar, assuming bulk modulus 50.0 GPa"
+    python ../../../scalePOSCAR.py CONTCAR $(awk -v p="$avg_p" 'BEGIN { printf "%.6f", p / 500 }')
 
     # Backup and prepare next POSCAR
-    cp POSCAR ../POSCAR_last
     cp POSCAR_scaled ../POSCAR
 
     cd ..
@@ -120,35 +112,27 @@ echo "=== Iterative scaling finished ==="
 
 echo "=== Final equilibration ==="
 cd ..
-cp scale/POSCAR POSCAR
+mkdir -p "final_eql"
+cp scale/POSCAR final_eql/POSCAR
+cp INCAR final_eql/INCAR
+cd final_eql
+ln -sf ../../POTCAR POTCAR
+ln -sf ../../KPOINTS KPOINTS
+# chang NSW in INCAR to 20 ps/POTIM
+POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
+# Compute number of steps: 20 ps = 20000 fs
+NSW=$(awk -v potim="$POTIM" 'BEGIN { printf "%d", 20000 / potim }')
 
+# Replace NSW line in INCAR with new value
+awk -v nsw="$NSW" '
+    BEGIN { IGNORECASE = 1 }
+    $1 == "NSW" {
+        print "NSW = " nsw
+        next
+    }
+    { print }
+' INCAR > INCAR_tmp && mv INCAR_tmp INCAR
 echo "Running VASP..."
-$VASP_COMMAND > vasp.out &    # run in background
-vasp_pid=$!
-
-while kill -0 $vasp_pid 2>/dev/null; do
-    if [ -f OSZICAR ]; then
-        ionic_lines=$(grep -E '^\s*[0-9]+ T=' OSZICAR | tee ionic_oszicar.log | wc -l)
-
-        if (( ionic_lines >= window_4ps )); then
-            tail -n $window_4ps ionic_oszicar.log | awk '{ print $7 }' > F_values.log
-
-            avgF_2ps=$(tail -n $window_2ps F_values.log | awk '{s+=$1} END {print s/NR}')
-            avgF_4ps=$(awk '{s+=$1} END {print s/NR}' F_values.log)
-            delta=$(awk -v a=$avgF_2ps -v b=$avgF_4ps 'BEGIN {print (a - b) * 1000}')
-            abs_delta=$(awk -v d=$delta 'BEGIN {print (d < 0 ? -d : d)}')
-
-            echo "Energy convergence ΔF = $abs_delta meV"
-
-            if (( $(awk -v d=$abs_delta -v t=$tolerance_meV 'BEGIN {print (d < t)}') )); then
-                echo "F converged within $tolerance_meV meV. Terminating VASP..."
-                kill $vasp_pid
-                wait $vasp_pid 2>/dev/null
-                break
-            fi
-        fi
-    fi
-    sleep 60
-done
+$VASP_COMMAND > vasp.out 
 
 echo "=== Final equilibration done==="

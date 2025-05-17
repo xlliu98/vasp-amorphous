@@ -8,34 +8,34 @@ GGA = PE
 ------------------------------------------                                                                                  
 Electronic Relaxation:                                                                                                      
 ------------------------------------------                                                                                  
-   LREAL  = Auto                                                        
-   ENCUT  = 520                                                                                                                                                                                                         
-   PREC   = Normal      
-   EDIFF  = 1e-5                                                              
-   ALGO  = Normal         
-   NELM=  60                                                                                               
-   NELMIN = 6                                                                  
-   ISPIN  = 1               
-   IVDW = 11                                                                                                               
+LREAL  = Auto                                                        
+ENCUT  = 520                                                                                                                                                                                                         
+PREC   = Normal      
+EDIFF  = 1e-5                                                              
+ALGO  = Normal         
+NELM=  60                                                                                               
+NELMIN = 6                                                                  
+ISPIN  = 1               
+IVDW = 11                                                                                                               
 -------------------------------------------                                                                                 
 Ionic Relaxation:                                                                                                           
 -------------------------------------------                                                                                                                    
-   NSW    = 0                                                          
-   IBRION = -1                
-   ISIF   = 3                  
+NSW    = 0                                                          
+IBRION = -1                
+ISIF   = 3                  
 --------------------------------------------                                                                                
 DOS Related:                                                                                                                
 --------------------------------------------                                                                                
-   ISMEAR = 0                                                                                                               
-   SIGMA  = 0.05                                                                                                                                                                                                                
+ISMEAR = 0                                                                                                               
+SIGMA  = 0.05                                                                                                                                                                                                                
 --------------------------------------------                                                                                
 Output Control:                                                                                                             
 --------------------------------------------                                                                                
-   LWAVE  = .FALSE.                                                                                                         
-   LCHARG= .FALSE.
-   NWRITE = 1
-   ML_MB = 3000   
-   NCORE= 16
+LWAVE  = .FALSE.                                                                                                         
+LCHARG= .FALSE.
+NWRITE = 1
+ML_MB = 3000   
+NCORE= 16
     
                                                                                                     
                                                                                                                             
