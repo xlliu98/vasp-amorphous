@@ -1,0 +1,45 @@
+SYSTEM = LiTaCl6
+ISTART =0                                                                                                                   
+ICHARG =2                                                                                                                  
+ISYM = 0                                                                                                             
+GGA = PE        
+ML_LMLFF  = .TRUE.
+ML_MODE = run
+ML_OUTBLOCK = 20   
+POTIM = 1         
+------------------------------------------                                                                                  
+Electronic Relaxation:                                                                                                      
+------------------------------------------                                                                                  
+LREAL  = Auto          
+ENCUT  = 340                                                                                                      
+PREC   = Normal        
+EDIFF  = 1e-5                                                           
+ALGO  = Normal                      
+NELM =  60                                          
+NELMIN = 6                                    
+ISPIN  = 1                                               
+IVDW = 11                                                                                                               
+-------------------------------------------                                                                                 
+Ionic Relaxation:                                                                                                           
+-------------------------------------------                                                                                                                    
+NSW    = 2000000                                                                         
+IBRION = 0                
+MDALGO = 3               
+LANGEVIN_GAMMA= 5 
+ISIF = 2                   
+TEBEG = 1500
+TEEND = 1500                                                                                  
+ISMEAR = 0                                                                                                               
+SIGMA  = 0.05                                                                                                                                                                                                                      
+--------------------------------------------                                                                                
+Output Control:                                                                                                             
+--------------------------------------------                                                                                
+LWAVE  = .FALSE.                                                                                                         
+LCHARG= .FALSE.  
+NCORE = 16
+    
+                                                                                                    
+                                                                                                                            
+
+
+

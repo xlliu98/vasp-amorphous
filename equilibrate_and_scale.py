@@ -1,3 +1,4 @@
+import re
 import subprocess
 import os
 from utils import vasp_potcar_recommended, modify_incar
@@ -170,7 +171,24 @@ modify_incar(
 
 subprocess.call("mv INCAR_TEMP INCAR_OPT", shell=True)
 
-# ----- Generate and run slurm script -------------------------------------------------------------
+# ----- Modify, generate and run slurm script -------------------------------------------------------------
+folder = "slurm_scripts"
+# Regex pattern to find SLURM -J lines
+pattern = re.compile(r"^(#SBATCH\s+-J\s+)(\S+)", re.IGNORECASE)
+
+for filename in os.listdir(folder):
+    if filename.endswith(".sh"):
+        filepath = os.path.join(folder, filename)
+        
+        with open(filepath, "r") as f:
+            lines = f.readlines()
+
+        with open(filepath, "w") as f:
+            for line in lines:
+                match = pattern.match(line)
+                if match:
+                    line = f"{match.group(1)}{systemName}\n"
+                f.write(line)
 subprocess.call(f"cat {AIMDslurm} equilibrate_and_scale.sh > equilibrate_and_scale/run.sh", shell=True)
 os.chdir("equilibrate_and_scale")
 subprocess.call("sbatch run.sh", shell=True)
