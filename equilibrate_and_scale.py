@@ -11,7 +11,6 @@ box_diam     = 12.0                      # Å
 packmolPath = "/home/xiaolin/software/packmol-20.15.2/packmol"
 potcarPath = "/home/xiaolin/VASP/paw-pbe-64"
 AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
-MLFFslurm = "slurm_scripts/run_kepler_cpu.sh"
 potcarDict = {"Li": "Li", "Ta": "Ta_pv", "Cl": "Cl"}  # use a lower ENMAX for Li
 # ---------------------------------------------------------------------------
 
@@ -132,6 +131,8 @@ temperature = int((melting_point + 300 - 1)/ 300) * 300
 cwd = os.getcwd()
 os.chdir("incar_templates")
 
+langevin_gamma_values = [str(5)] * len(stoich)
+
 # Step 1: Generate INCAR_NVT_EQL used in section 1 for equilibration
 modify_incar(
     "INCAR_NVT", "INCAR_NVT_EQL",
@@ -141,6 +142,7 @@ modify_incar(
         "POTIM": f"{timestep:.2f}",
         "TEBEG": temperature,
         "TEEND": temperature,
+        "LANGEVIN_GAMMA": ' '.join(langevin_gamma_values),
     }
 )
 
@@ -182,6 +184,7 @@ for mlffINCAR in mlffINCARs:
         {
             "SYSTEM": systemName,
             "ENCUT": f"{1.3 * max_enmax:.2f}",
+            "LANGEVIN_GAMMA": ' '.join(langevin_gamma_values),
         }
     )
     subprocess.call(f"mv INCAR_TEMP {mlffINCAR}", shell=True)
