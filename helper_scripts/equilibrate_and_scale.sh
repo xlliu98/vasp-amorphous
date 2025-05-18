@@ -40,6 +40,8 @@ while kill -0 $vasp_pid 2>/dev/null; do
 done
 
 
+
+
 # Parameters for iterative scaling
 max_iter=20
 tolerance_kbar=5
@@ -48,7 +50,6 @@ cd "scale"
 ln -sf ../../incar_templates/INCAR_NVT_SCALE INCAR
 ln -sf ../../POTCAR POTCAR
 ln -sf ../../KPOINTS KPOINTS
-cp ../CONTCAR POSCAR
 # Extract values from INCAR
 NSW=$(awk '$1 == "NSW" {print $3}' INCAR)
 POTIM=$(awk '$1 == "POTIM" {print $3}' INCAR)
@@ -57,6 +58,22 @@ timestep_fs=$POTIM
 avg_window_ps=2
 run_time_ps=$(awk -v n="$NSW" -v p="$POTIM" 'BEGIN { printf "%.3f\n", n * p / 1000 }')
 steps_to_average=$(awk -v avg=2 -v p="$POTIM" 'BEGIN { printf "%.0f\n", avg * 1000 / p }')
+
+
+cd ..
+# Parse pressure from OUTCAR in the first equilibrated run
+echo "Extracting pressure..."
+grep "total pressure" OUTCAR | awk '{print $(NF-1)}' > p.log
+tail -n $steps_to_average p.log > p_tail.log
+avg_p=$(awk '{sum+=$1} END {print sum/NR}' p_tail.log)
+echo "Average pressure over last ${avg_window_ps} ps = $avg_p kBar"
+
+# Rescale using Python
+echo "Rescaling lattice with pressure $avg_p kBar, assuming bulk modulus 50.0 GPa"
+python ../scalePOSCAR.py CONTCAR $(awk -v p="$avg_p" 'BEGIN { printf "%.6f", p / 500 }')
+
+cd "scale" 
+cp ../POSCAR_scaled POSCAR
 
 # Print result
 echo "Running $NSW steps at $POTIM fs/step = $run_time_ps ps total"
