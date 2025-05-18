@@ -5,12 +5,15 @@ import os
 startTemp = 1500 # K, starting temperature for quenching, will be rounded to the nearest multiples of 300 K, guranteed to be equal to or larger than original value.
 endTemp=300
 step=300
-AIMDslurm = "slurm/scripts/run_kepler_gpu.sh"
+# on perlmutter
+AIMDslurm = "slurm_scripts/run_perlmutter_gpu.sh"
+# on kepler
+# AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
 # ---------------------------------------------------------------------------
 
 # ----- Copy equilibrated POSCAR File -------------------------------------------------------------
 workingDir = "quench_and_opt"
-os.mkdir(workingDir, exist_ok=True)
+os.makedirs(workingDir, exist_ok=True)
 subprocess.call(f"cp equilibrate_and_scale/POSCAR {workingDir}/POSCAR", shell=True)
 
 # ----- Copy INCAR file -------------------------------------------------------------

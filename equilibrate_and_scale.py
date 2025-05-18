@@ -8,10 +8,17 @@ stoich       = {"Li": 1, "Ta": 1, "Cl": 6}                      # LiTaCl₆
 density      = 2.96                      # g cm⁻³
 melting_point = 1500 # K, will be rounded to the nearest multiples of 300 K, guranteed to be equal to or larger than original value.
 box_diam     = 12.0                      # Å
-packmolPath = "/home/xiaolin/software/packmol-20.15.2/packmol"
-potcarPath = "/home/xiaolin/VASP/paw-pbe-64"
-AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
 potcarDict = {"Li": "Li", "Ta": "Ta_pv", "Cl": "Cl"}  # use a lower ENMAX for Li
+# on perlmutter
+packmolPath = "/pscratch/sd/x/xlliu9/Software/packmol/packmol"
+potcarPath = "/global/common/software/nersc9/vasp/dependencies/pseudopotentials/PBE/potpaw_PBE.64"
+AIMDslurm = "slurm_scripts/run_perlmutter_gpu.sh"
+
+# on kepler
+# packmolPath = "/home/xiaolin/software/packmol-20.15.2/packmol"
+# potcarPath = "/home/xiaolin/VASP/paw-pbe-64"
+# AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
+
 # ---------------------------------------------------------------------------
 
 # ----- Generate POSCAR File -------------------------------------------------------------
