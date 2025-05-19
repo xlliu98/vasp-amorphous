@@ -2,9 +2,6 @@ import numpy as np
 import sys
 
 def scalePOSCAR(filePath, scale):
-    # # Convert pressure (kbar) to scaling factor
-    # p_GPa = pressure_kbar / 10.0
-    # scale = (1 + p_GPa / bulk) ** (1 / 3)
 
     # Read POSCAR
     lines = []

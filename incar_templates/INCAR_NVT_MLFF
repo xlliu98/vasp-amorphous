@@ -1,4 +1,4 @@
-SYSTEM = LiTaCl6
+SYSTEM = Li1Ta1Cl6
 ISTART =0                                                                                                                   
 ICHARG =2                                                                                                                  
 ISYM = 0                                                                                                             
@@ -11,7 +11,7 @@ POTIM = 1
 Electronic Relaxation:                                                                                                      
 ------------------------------------------                                                                                  
 LREAL  = Auto          
-ENCUT  = 340                                                                                                      
+ENCUT = 341.21
 PREC   = Normal        
 EDIFF  = 1e-5                                                           
 ALGO  = Normal                      
@@ -25,7 +25,7 @@ Ionic Relaxation:
 NSW    = 2000000                                                                         
 IBRION = 0                
 MDALGO = 3               
-LANGEVIN_GAMMA= 5 
+LANGEVIN_GAMMA = 5 5 5
 ISIF = 2                   
 TEBEG = 1500
 TEEND = 1500                                                                                  
