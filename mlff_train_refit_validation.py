@@ -5,9 +5,9 @@ from utils import modify_incar
 temps = list(range(300, 501, 50)) # Temperature range for MLFF validation 
 trainingSlurm = "slurm_scripts/run_perlmutter_gpu.sh"
 refitSlurm = "slurm_scripts/run_perlmutter_cpu_4nodes_debug.sh"
-mlffSlurm = "slurm_scripts/run_perlmutter_cpu_1node_1h.sh"
-mlffValidationAb = "slurm_scripts/run_perlmutter_gpu_1node_1h.sh"
-mlffValidationML = "slurm_scripts/run_perlmutter_cpu_1node_1h.sh"
+mlffSlurm = "slurm_scripts/run_perlmutter_cpu_1h.sh"
+mlffValidationAb = "slurm_scripts/run_perlmutter_gpu_1h.sh"
+mlffValidationML = "slurm_scripts/run_perlmutter_cpu_1h.sh"
 # ---------------------------------------------------------------------------
 
 # ----- Create the directory under mlff_training and copy POSCAR file -------------------------------------------------------------
@@ -60,15 +60,11 @@ os.chdir(workingDir)
 
 # ----- Copy and modify INCAR file for test run -------------------------------------------------------------
 modify_incar(
-    f"../{prevWorkingDir}/INCAR", "INCAR",
+    "../incar_templates/INCAR_NVT_MLFF", "INCAR",
     {
-        "ML_MODE": "run",
         "NSW" : "50000"
     }
 )
-with open("INCAR", "a") as f:
-    f.write("ML_OUTBLOCK = 20")
-
 # ----- Generate and run slurm script -------------------------------------------------------------
 for temp in temps:
     currDir = f"{temp}K"
