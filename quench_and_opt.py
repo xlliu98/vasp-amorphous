@@ -6,9 +6,9 @@ startTemp = 1500 # K, starting temperature for quenching, will be rounded to the
 endTemp=300
 step=300
 # on perlmutter
-AIMDslurm = "slurm_scripts/run_perlmutter_gpu.sh"
+# AIMDslurm = "slurm_scripts/run_perlmutter_gpu.sh"
 # on kepler
-# AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
+AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
 # ---------------------------------------------------------------------------
 
 # ----- Copy equilibrated POSCAR File -------------------------------------------------------------
