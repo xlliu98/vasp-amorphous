@@ -6,9 +6,10 @@ startTemp = 1500 # K, starting temperature for quenching, will be rounded to the
 endTemp=300
 step=300
 # on perlmutter
-# AIMDslurm = "slurm_scripts/run_perlmutter_gpu.sh"
+AIMDslurm = "slurm_scripts/run_perlmutter_gpu_shared.sh"
+=======
 # on kepler
-AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
+#AIMDslurm = "slurm_scripts/run_kepler_gpu.sh"
 # ---------------------------------------------------------------------------
 
 # ----- Copy equilibrated POSCAR File -------------------------------------------------------------
@@ -29,11 +30,11 @@ with open("helper_scripts/quench_and_opt.sh", "r") as infile, open(f"{workingDir
         if "=" in stripped and not stripped.startswith("#"):
             key = stripped.split("=")[0].strip().upper()
             if key == "STARTTEMP":
-                outfile.write(f"startTemp = {startTemp}\n")
+                outfile.write(f"startTemp={startTemp}\n")
             elif key == "ENDTEMP":
-                outfile.write(f"endTemp = {endTemp}\n")    
+                outfile.write(f"endTemp={endTemp}\n")    
             elif key == "STEP":
-                outfile.write(f"step = {step}\n")
+                outfile.write(f"step={step}\n")
             else:
                 outfile.write(line)
         else:
