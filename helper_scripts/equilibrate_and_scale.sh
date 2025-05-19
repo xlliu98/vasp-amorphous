@@ -67,7 +67,14 @@ grep "total pressure" OUTCAR | awk '{print $(NF-1)}' > p.log
 tail -n $steps_to_average p.log > p_tail.log
 avg_p=$(awk '{sum+=$1} END {print sum/NR}' p_tail.log)
 echo "Average pressure over last ${avg_window_ps} ps = $avg_p kBar"
+abs_p=$(awk -v p="$avg_p" 'BEGIN {print (p < 0) ? -p : p}')
+is_converged=$(awk -v a="$abs_p" -v t="$tolerance_kbar" 'BEGIN {print (a < t) ? 1 : 0}')
 
+if [ "$is_converged" -eq 1 ]; then
+    echo "Converged: Pressure within ±${tolerance_kbar} kBar."
+    cp CONTCAR POSCAR
+    break
+else
 # Rescale using Python
 echo "Rescaling lattice with pressure $avg_p kBar, assuming bulk modulus 50.0 GPa"
 python ../scalePOSCAR.py CONTCAR $(awk -v p="$avg_p" 'BEGIN { printf "%.6f", p / 500 }')
@@ -107,8 +114,11 @@ for ((i=1; i<=max_iter; i++)); do
     echo "Average pressure over last ${avg_window_ps} ps = $avg_p kBar"
 
     # Check if pressure is within tolerance
-    abs_p=$(echo ${avg_p#-})  # remove minus sign
-    if (( $(echo "$abs_p < $tolerance_kbar" | bc -l) )); then
+    # Check if pressure is within tolerance
+    abs_p=$(awk -v p="$avg_p" 'BEGIN {print (p < 0) ? -p : p}')
+    is_converged=$(awk -v a="$abs_p" -v t="$tolerance_kbar" 'BEGIN {print (a < t) ? 1 : 0}')
+
+    if [ "$is_converged" -eq 1 ]; then
         echo "Converged: Pressure within ±${tolerance_kbar} kBar."
         cp CONTCAR ../POSCAR
         break
@@ -126,9 +136,10 @@ for ((i=1; i<=max_iter; i++)); do
 done
 
 echo "=== Iterative scaling finished ==="
+cd ..
+fi
 
 echo "=== Final equilibration ==="
-cd ..
 mkdir -p "final_eql"
 cp scale/POSCAR final_eql/POSCAR
 cp INCAR final_eql/INCAR
