@@ -5,18 +5,15 @@ import sys
 
 count = 0
 trjFile = "XDATCAR"
-delimiter = sys.argv[1]
-with open(trjFile, 'r') as file:
-    for line in file:
-        if line.strip() == delimiter and count != 0:
-            break
-        count += 1
-
 with open(trjFile, 'r') as file:
     lines = file.readlines()
-
+natoms = sum(int(_) for _ in lines[6].split())
+count = natoms + 1
+header = "".join(lines[:7])
+lines = lines[7:]
 nStruct = len(lines)/count
 dist = int(nStruct//50)
+
 
 newFolder = "POSCAR_for_validation"
 os.makedirs(newFolder, exist_ok=True)
@@ -28,5 +25,6 @@ for i in range(0, 50):
         os.makedirs(newDir, exist_ok=True)
         os.chdir(newDir)
         with open("POSCAR", 'w') as file:
+            file.write(header)
             file.writelines(lines[count * i * dist:count*(i * dist + 1)])
         os.chdir("../")
