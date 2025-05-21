@@ -43,7 +43,7 @@ for i in $(seq 0 20); do
 done
 
 # Loop through scale pairs
-for i in $(seq 1 ${#abs_scales[@]}); do
+for ((i = 1; i < ${#abs_scales[@]}; i++)); do
     prev_scale=${abs_scales[$((i - 1))]}
     curr_scale=${abs_scales[$i]}
     dir=$(printf "scale_%03d" $i)
